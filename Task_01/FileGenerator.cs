@@ -4,13 +4,11 @@ namespace Task_01;
 
 public class FileGenerator(IContentGenerator contentGenerator, int linesCount)
 {
-    public async Task CreateFilesAsync(int count, string directoryPath, string fileNamePrefix = "file_")
+    public async Task CreateFilesAsync(int count, DirectoryInfo directoryInfo, string fileNamePrefix = "file_")
     {
-        Directory.CreateDirectory(directoryPath);
-        
         await Parallel.ForAsync(0, count - 1, async (i, _) =>
         {
-            var path = Path.Combine(directoryPath, $"{fileNamePrefix}{i}");
+            var path = Path.Combine(directoryInfo.FullName, $"{fileNamePrefix}{i}");
             await CreateFileAsync(path);
         });
     }
