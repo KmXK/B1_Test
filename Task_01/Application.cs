@@ -8,6 +8,7 @@ namespace Task_01;
 public class Application(
         IFileMerger fileMerger,
         IFileGenerator fileGenerator,
+        IDataImporter dataImporter,
         ILogger<Application> logger)
     : IHostedService
 {
@@ -15,14 +16,26 @@ public class Application(
     {
         var folder = Path.Combine(Environment.CurrentDirectory, "files");
         var directoryInfo = Directory.CreateDirectory(folder);
-        
+
         await GenerateFilesAsync(directoryInfo);
         await MergeFilesAsync(directoryInfo);
+        await ImportFilesAsync(directoryInfo);
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
     {
         return Task.CompletedTask;
+    }
+
+    private async Task ImportFilesAsync(DirectoryInfo directoryInfo)
+    {
+        logger.LogInformation("File importing started.");
+        
+        var files = directoryInfo.EnumerateFiles();
+
+        await dataImporter.Import(files);
+        
+        logger.LogInformation("File importing has been completed.");
     }
 
     private async Task MergeFilesAsync(DirectoryInfo directoryInfo)

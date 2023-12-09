@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Task_01;
+using Task_01.Options;
 using Task_01.Persistence;
 using Task_01.Services;
 using Task_01.Services.Interfaces;
@@ -19,11 +20,15 @@ hostBuilder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 hostBuilder.Logging
     .ClearProviders()
+    .SetMinimumLevel(LogLevel.Warning)
     .AddSimpleConsole();
+
+hostBuilder.Services.Configure<DataImporterOptions>(configuration.GetSection("Importer"));
 
 hostBuilder.Services.AddSingleton<IContentGenerator, RandomContentGenerator>();
 hostBuilder.Services.AddTransient<IFileGenerator, FileGenerator>();
 hostBuilder.Services.AddTransient<IFileMerger, FileMerger>();
+hostBuilder.Services.AddTransient<IDataImporter, DataImporter>();
 
 hostBuilder.Services.AddHostedService<Application>();
 
