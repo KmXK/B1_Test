@@ -1,8 +1,7 @@
-﻿using System.Globalization;
-using System.Reflection;
-using System.Text;
+﻿using System.Text;
+using Task_01.Services.Interfaces;
 
-namespace Task_01.ContentGenerator;
+namespace Task_01.Services;
 
 public class RandomContentGenerator : IContentGenerator
 {

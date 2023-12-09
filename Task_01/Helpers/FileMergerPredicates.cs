@@ -1,4 +1,4 @@
-﻿namespace Task_01;
+﻿namespace Task_01.Helpers;
 
 public static class FileMergerPredicates
 {

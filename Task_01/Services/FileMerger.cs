@@ -1,8 +1,10 @@
-﻿namespace Task_01;
+﻿using Task_01.Services.Interfaces;
 
-public static class FileMerger
+namespace Task_01.Services;
+
+public class FileMerger : IFileMerger
 {
-    public static async Task Merge(
+    public async Task MergeAsync(
         IEnumerable<FileInfo> files,
         string outputFilePath,
         Func<string, bool>? mergeLinePredicate = null)

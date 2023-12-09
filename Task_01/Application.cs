@@ -1,10 +1,15 @@
-﻿using Task_01.ContentGenerator;
+﻿using Microsoft.Extensions.Hosting;
+using Task_01.Helpers;
+using Task_01.Services.Interfaces;
 
 namespace Task_01;
 
-public static class Application
+public class Application(
+        IFileMerger fileMerger,
+        IFileGenerator fileGenerator)
+    : IHostedService
 {
-    public static async Task RunAsync()
+    public async Task StartAsync(CancellationToken cancellationToken)
     {
         var folder = Path.Combine(Environment.CurrentDirectory, "files");
         var directoryInfo = Directory.CreateDirectory(folder);
@@ -13,25 +18,26 @@ public static class Application
         await MergeFilesAsync(directoryInfo);
     }
 
-    private static async Task MergeFilesAsync(DirectoryInfo directoryInfo)
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+
+    private async Task MergeFilesAsync(DirectoryInfo directoryInfo)
     {
         Console.WriteLine($"[{DateTime.Now:hh:mm:ss.fff}] Merging started.");
         
         var files = directoryInfo.EnumerateFiles();
         var outputFileName = Path.Combine(Environment.CurrentDirectory, "merge.txt");
 
-        await FileMerger.Merge(files, outputFileName, FileMergerPredicates.NotContainsValue("2023"));
+        await fileMerger.MergeAsync(files, outputFileName, FileMergerPredicates.NotContainsValue("2023"));
         
         Console.WriteLine($"[{DateTime.Now:hh:mm:ss.fff}] Merging has been completed.");
     }
 
-    private static async Task GenerateFilesAsync(DirectoryInfo directoryInfo)
+    private async Task GenerateFilesAsync(DirectoryInfo directoryInfo)
     {
         Console.WriteLine("File generation started.");
-
-        var fileGenerator = new FileGenerator(
-            new RandomContentGenerator(),
-            linesCount: 100_000);
 
         await fileGenerator.CreateFilesAsync(100, directoryInfo);
 

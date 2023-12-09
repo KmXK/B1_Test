@@ -1,4 +1,4 @@
-﻿namespace Task_01.ContentGenerator;
+﻿namespace Task_01.Services.Interfaces;
 
 public interface IContentGenerator
 {
