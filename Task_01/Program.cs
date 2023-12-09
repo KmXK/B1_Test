@@ -20,7 +20,6 @@ hostBuilder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 hostBuilder.Logging
     .ClearProviders()
-    .SetMinimumLevel(LogLevel.Warning)
     .AddSimpleConsole();
 
 hostBuilder.Services.Configure<DataImporterOptions>(configuration.GetSection("Importer"));

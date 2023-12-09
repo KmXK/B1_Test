@@ -43,7 +43,7 @@ public class DataImporter(
 
                     if (count % 25000 == 0)
                     {
-                        Console.WriteLine($"IMPORT: Read {count} elements from file.");
+                        logger.LogInformation("Read {count} elements from file.", count);
                         count = 0;
                     }
 
@@ -55,7 +55,7 @@ public class DataImporter(
 
                 if (count > 0)
                 {
-                    Console.WriteLine($"IMPORT: Read {count} elements from file.");
+                    logger.LogInformation("IMPORT: Read {count} elements from file.", count);
                 }
             }
             
@@ -87,7 +87,7 @@ public class DataImporter(
                     writeSemaphore.Release(1);
                 }
 
-                Console.WriteLine($"IMPORT: Wrote {data.Count} elements to db. Waiting: {bag.Count}.");
+                logger.LogInformation("IMPORT: Wrote {data} elements to db. Waiting: {bag}", data.Count, bag.Count);
                 context.BulkInsert(data);
                 
                 data.Clear();
