@@ -12,4 +12,8 @@ public class BankAccount : Entity
     public int BankId { get; set; }
 
     public Bank Bank { get; set; } = null!;
+    
+    public byte ClassNumber { get; set; }
+
+    public BankClass BankClass { get; set; } = null!;
 }

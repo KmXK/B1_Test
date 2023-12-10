@@ -11,17 +11,17 @@ public class AccountTurnoverStatement : Entity<Guid>
     
     public Guid TurnoverStatementId { get; set; }
     
-    public long IncomingBalance { get; set; }
+    public decimal IncomingBalance { get; set; }
     
-    public long DebitTurnover { get; set; }
+    public decimal DebitTurnover { get; set; }
     
-    public long CreditTurnover { get; set; }
+    public decimal CreditTurnover { get; set; }
     
     public BankAccount Account { get; set; } = null!;
 
     public TurnoverStatement TurnoverStatement { get; set; } = null!;
 
-    public long OutgoingBalance
+    public decimal OutgoingBalance
     {
         get
         {

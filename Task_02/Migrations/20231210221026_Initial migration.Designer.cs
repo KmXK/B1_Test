@@ -12,7 +12,7 @@ using Task_02.Persistence;
 namespace Task_02.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20231210164134_Initial migration")]
+    [Migration("20231210221026_Initial migration")]
     partial class Initialmigration
     {
         /// <inheritdoc />
@@ -37,14 +37,17 @@ namespace Task_02.Migrations
                     b.Property<int>("BankId")
                         .HasColumnType("int");
 
-                    b.Property<long>("CreditTurnover")
-                        .HasColumnType("bigint");
+                    b.Property<decimal>("CreditTurnover")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<long>("DebitTurnover")
-                        .HasColumnType("bigint");
+                    b.Property<decimal>("DebitTurnover")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
-                    b.Property<long>("IncomingBalance")
-                        .HasColumnType("bigint");
+                    b.Property<decimal>("IncomingBalance")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<Guid>("TurnoverStatementId")
                         .HasColumnType("uniqueidentifier");
@@ -87,10 +90,15 @@ namespace Task_02.Migrations
                     b.Property<short>("AccountNumber")
                         .HasColumnType("smallint");
 
+                    b.Property<byte>("ClassNumber")
+                        .HasColumnType("tinyint");
+
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
                     b.HasKey("BankId", "AccountNumber");
+
+                    b.HasIndex("BankId", "ClassNumber");
 
                     b.ToTable("BankAccounts", (string)null);
                 });
@@ -102,6 +110,11 @@ namespace Task_02.Migrations
 
                     b.Property<byte>("ClassNumber")
                         .HasColumnType("tinyint");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .IsUnicode(true)
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("BankId", "ClassNumber");
 
@@ -139,7 +152,7 @@ namespace Task_02.Migrations
             modelBuilder.Entity("Task_02.Persistence.Entities.AccountTurnoverStatement", b =>
                 {
                     b.HasOne("Task_02.Persistence.Entities.TurnoverStatement", "TurnoverStatement")
-                        .WithMany()
+                        .WithMany("AccountTurnoverStatements")
                         .HasForeignKey("TurnoverStatementId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -163,13 +176,21 @@ namespace Task_02.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.HasOne("Task_02.Persistence.Entities.BankClass", "BankClass")
+                        .WithMany("Accounts")
+                        .HasForeignKey("BankId", "ClassNumber")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.Navigation("Bank");
+
+                    b.Navigation("BankClass");
                 });
 
             modelBuilder.Entity("Task_02.Persistence.Entities.BankClass", b =>
                 {
                     b.HasOne("Task_02.Persistence.Entities.Bank", "Bank")
-                        .WithMany()
+                        .WithMany("Classes")
                         .HasForeignKey("BankId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
@@ -186,6 +207,21 @@ namespace Task_02.Migrations
                         .IsRequired();
 
                     b.Navigation("Bank");
+                });
+
+            modelBuilder.Entity("Task_02.Persistence.Entities.Bank", b =>
+                {
+                    b.Navigation("Classes");
+                });
+
+            modelBuilder.Entity("Task_02.Persistence.Entities.BankClass", b =>
+                {
+                    b.Navigation("Accounts");
+                });
+
+            modelBuilder.Entity("Task_02.Persistence.Entities.TurnoverStatement", b =>
+                {
+                    b.Navigation("AccountTurnoverStatements");
                 });
 #pragma warning restore 612, 618
         }

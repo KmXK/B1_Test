@@ -13,4 +13,6 @@ public class TurnoverStatement : Entity<Guid>
     public DateTime CreationDate { get; set; }
 
     public Bank Bank { get; set; } = null!;
+    
+    public ICollection<AccountTurnoverStatement> AccountTurnoverStatements { get; set; } = new HashSet<AccountTurnoverStatement>();
 }

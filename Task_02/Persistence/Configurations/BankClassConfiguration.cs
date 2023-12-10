@@ -12,9 +12,11 @@ public class BankClassConfiguration : IEntityTypeConfiguration<BankClass>
         
         builder.HasKey(x => new { x.BankId, x.ClassNumber });
 
+        builder.Property(x => x.Name).IsUnicode().IsRequired();
+
         builder
             .HasOne(x => x.Bank)
-            .WithMany()
+            .WithMany(x => x.Classes)
             .HasForeignKey(x => x.BankId)
             .OnDelete(DeleteBehavior.NoAction);
     }

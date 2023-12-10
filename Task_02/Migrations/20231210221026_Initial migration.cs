@@ -25,29 +25,12 @@ namespace Task_02.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "BankAccounts",
-                columns: table => new
-                {
-                    AccountNumber = table.Column<short>(type: "smallint", nullable: false),
-                    BankId = table.Column<int>(type: "int", nullable: false),
-                    Type = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_BankAccounts", x => new { x.BankId, x.AccountNumber });
-                    table.ForeignKey(
-                        name: "FK_BankAccounts_Banks_BankId",
-                        column: x => x.BankId,
-                        principalTable: "Banks",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "BankClasses",
                 columns: table => new
                 {
                     ClassNumber = table.Column<byte>(type: "tinyint", nullable: false),
-                    BankId = table.Column<int>(type: "int", nullable: false)
+                    BankId = table.Column<int>(type: "int", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -82,6 +65,30 @@ namespace Task_02.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "BankAccounts",
+                columns: table => new
+                {
+                    AccountNumber = table.Column<short>(type: "smallint", nullable: false),
+                    BankId = table.Column<int>(type: "int", nullable: false),
+                    Type = table.Column<int>(type: "int", nullable: false),
+                    ClassNumber = table.Column<byte>(type: "tinyint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BankAccounts", x => new { x.BankId, x.AccountNumber });
+                    table.ForeignKey(
+                        name: "FK_BankAccounts_BankClasses_BankId_ClassNumber",
+                        columns: x => new { x.BankId, x.ClassNumber },
+                        principalTable: "BankClasses",
+                        principalColumns: new[] { "BankId", "ClassNumber" });
+                    table.ForeignKey(
+                        name: "FK_BankAccounts_Banks_BankId",
+                        column: x => x.BankId,
+                        principalTable: "Banks",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AccountTurnoverStatements",
                 columns: table => new
                 {
@@ -89,9 +96,9 @@ namespace Task_02.Migrations
                     BankId = table.Column<int>(type: "int", nullable: false),
                     AccountNumber = table.Column<short>(type: "smallint", nullable: false),
                     TurnoverStatementId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    IncomingBalance = table.Column<long>(type: "bigint", nullable: false),
-                    DebitTurnover = table.Column<long>(type: "bigint", nullable: false),
-                    CreditTurnover = table.Column<long>(type: "bigint", nullable: false)
+                    IncomingBalance = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    DebitTurnover = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    CreditTurnover = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -121,6 +128,11 @@ namespace Task_02.Migrations
                 column: "TurnoverStatementId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_BankAccounts_BankId_ClassNumber",
+                table: "BankAccounts",
+                columns: new[] { "BankId", "ClassNumber" });
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Banks_Name",
                 table: "Banks",
                 column: "Name");
@@ -138,13 +150,13 @@ namespace Task_02.Migrations
                 name: "AccountTurnoverStatements");
 
             migrationBuilder.DropTable(
-                name: "BankClasses");
-
-            migrationBuilder.DropTable(
                 name: "BankAccounts");
 
             migrationBuilder.DropTable(
                 name: "TurnoverStatements");
+
+            migrationBuilder.DropTable(
+                name: "BankClasses");
 
             migrationBuilder.DropTable(
                 name: "Banks");
