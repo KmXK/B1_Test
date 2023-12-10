@@ -10,22 +10,30 @@ public class FileGenerator(
 {
     private const int LinesCount = 100_000;
     
-    public async Task CreateFilesAsync(int count, DirectoryInfo directoryInfo, string fileNamePrefix = "file_")
+    public async Task CreateFilesAsync(
+        int count,
+        DirectoryInfo directoryInfo,
+        string fileNamePrefix = "file_",
+        CancellationToken cancellationToken = default)
     {
-        await Parallel.ForAsync(0, count, async (i, _) =>
+        await Parallel.ForAsync(0, count, cancellationToken, async (i, c) =>
         {
+            c.ThrowIfCancellationRequested();
+            
             var path = Path.Combine(directoryInfo.FullName, $"{fileNamePrefix}{i}");
-            await CreateFileAsync(path);
+            await CreateFileAsync(path, c);
         });
     }
     
-    public async Task CreateFileAsync(string fullName)
+    public async Task CreateFileAsync(string fullName, CancellationToken cancellationToken = default)
     {
         var text = contentGenerator.Generate(LinesCount, Environment.NewLine);
         
         logger.LogDebug("Content for file {fileName} has been generated.", fullName);
         
-        await File.WriteAllTextAsync(fullName, text);
+        await File.WriteAllTextAsync(fullName, text, cancellationToken);
+
+        cancellationToken.ThrowIfCancellationRequested();
         
         logger.LogInformation("File {fileName} has been generated.", fullName);
     }

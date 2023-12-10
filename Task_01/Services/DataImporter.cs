@@ -15,7 +15,9 @@ public class DataImporter(
     ILogger<DataImporter> logger) 
     : IDataImporter
 {
-    public async Task Import(IEnumerable<FileInfo> files)
+    public async Task ImportAsync(
+        IEnumerable<FileInfo> files,
+        CancellationToken cancellationToken = default)
     {
         var bag = new ConcurrentBag<FileData>();
         var readSemaphore = new SemaphoreSlim(0);
@@ -35,8 +37,10 @@ public class DataImporter(
                 {
                     while (bag.Count >= options.Value.ReadBufferSize)
                     {
-                        readSemaphore.Wait();
+                        readSemaphore.Wait(cancellationToken);
                     }
+
+                    cancellationToken.ThrowIfCancellationRequested();
                     
                     count++;
                     bag.Add(ParseLine(line));
@@ -60,7 +64,7 @@ public class DataImporter(
             }
             
             writeSemaphore.Release(1);
-        });
+        }, cancellationToken);
 
         var writeTask = Task.Run(() =>
         {
@@ -68,7 +72,9 @@ public class DataImporter(
             
             while (true)
             {
-                writeSemaphore.Wait();
+                writeSemaphore.Wait(cancellationToken);
+                
+                cancellationToken.ThrowIfCancellationRequested();
                 
                 if (bag.IsEmpty) return;
                 
@@ -92,7 +98,7 @@ public class DataImporter(
                 
                 data.Clear();
             }
-        });
+        }, cancellationToken);
 
         await Task.WhenAll(readTask, writeTask);
     }

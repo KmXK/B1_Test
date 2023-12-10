@@ -9,7 +9,8 @@ public class FileMerger(ILogger<FileMerger> logger)
     public async Task MergeAsync(
         IEnumerable<FileInfo> files,
         string outputFilePath,
-        Func<string, bool>? mergeLinePredicate = null)
+        Func<string, bool>? mergeLinePredicate = null,
+        CancellationToken cancellationToken = default)
     {
         logger.LogDebug("Connection to output file {filePath} was opened.", outputFilePath);
         
@@ -26,7 +27,10 @@ public class FileMerger(ILogger<FileMerger> logger)
 
             do
             {
-                line = await file.ReadLineAsync();
+                line = await file.ReadLineAsync(cancellationToken);
+                
+                cancellationToken.ThrowIfCancellationRequested();
+                
                 logger.LogTrace("Line has been read.");
 
                 if (line != null && mergeLinePredicate?.Invoke(line) == true)

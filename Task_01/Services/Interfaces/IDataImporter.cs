@@ -2,5 +2,5 @@
 
 public interface IDataImporter
 {
-    Task Import(IEnumerable<FileInfo> files);
+    Task ImportAsync(IEnumerable<FileInfo> files, CancellationToken cancellationToken = default);
 }

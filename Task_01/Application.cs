@@ -17,9 +17,9 @@ public class Application(
         var folder = Path.Combine(Environment.CurrentDirectory, "files");
         var directoryInfo = Directory.CreateDirectory(folder);
 
-        await GenerateFilesAsync(directoryInfo);
-        await MergeFilesAsync(directoryInfo);
-        await ImportFilesAsync(directoryInfo);
+        await GenerateFilesAsync(directoryInfo, cancellationToken);
+        await MergeFilesAsync(directoryInfo, cancellationToken);
+        await ImportFilesAsync(directoryInfo, cancellationToken);
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
@@ -27,34 +27,38 @@ public class Application(
         return Task.CompletedTask;
     }
 
-    private async Task ImportFilesAsync(DirectoryInfo directoryInfo)
+    private async Task ImportFilesAsync(DirectoryInfo directoryInfo, CancellationToken cancellationToken)
     {
         logger.LogInformation("File importing started.");
         
         var files = directoryInfo.EnumerateFiles();
 
-        await dataImporter.Import(files);
+        await dataImporter.ImportAsync(files, cancellationToken);
         
         logger.LogInformation("File importing has been completed.");
     }
 
-    private async Task MergeFilesAsync(DirectoryInfo directoryInfo)
+    private async Task MergeFilesAsync(DirectoryInfo directoryInfo, CancellationToken cancellationToken)
     {
         logger.LogInformation("File merging started.");
         
         var files = directoryInfo.EnumerateFiles();
         var outputFileName = Path.Combine(Environment.CurrentDirectory, "merge.txt");
 
-        await fileMerger.MergeAsync(files, outputFileName, FileMergerPredicates.NotContainsValue("2023"));
+        await fileMerger.MergeAsync(
+            files,
+            outputFileName,
+            FileMergerPredicates.NotContainsValue("2023"),
+            cancellationToken);
         
         logger.LogInformation("File merging has been completed.");
     }
 
-    private async Task GenerateFilesAsync(DirectoryInfo directoryInfo)
+    private async Task GenerateFilesAsync(DirectoryInfo directoryInfo, CancellationToken cancellationToken)
     {
         logger.LogInformation("File generation started.");
 
-        await fileGenerator.CreateFilesAsync(100, directoryInfo);
+        await fileGenerator.CreateFilesAsync(100, directoryInfo, cancellationToken: cancellationToken);
 
         logger.LogInformation("File generation has been completed.");
     }

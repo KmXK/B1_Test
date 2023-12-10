@@ -5,5 +5,6 @@ public interface IFileMerger
     Task MergeAsync(
         IEnumerable<FileInfo> files,
         string outputFilePath,
-        Func<string, bool>? mergeLinePredicate = null);
+        Func<string, bool>? mergeLinePredicate = null,
+        CancellationToken cancellationToken = default);
 }
