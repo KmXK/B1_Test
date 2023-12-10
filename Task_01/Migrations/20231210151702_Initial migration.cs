@@ -15,7 +15,7 @@ namespace Task_01.Migrations
                 name: "FilesData",
                 columns: table => new
                 {
-                    Key = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Date = table.Column<DateOnly>(type: "date", nullable: false),
                     RussianString = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     EnglishString = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -24,7 +24,7 @@ namespace Task_01.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_FilesData", x => x.Key);
+                    table.PrimaryKey("PK_FilesData", x => x.Id);
                 });
         }
 

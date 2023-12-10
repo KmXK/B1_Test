@@ -9,7 +9,7 @@ using Task_01.Persistence;
 using Task_01.Services;
 using Task_01.Services.Interfaces;
 
-var hostBuilder = Host.CreateApplicationBuilder();
+var hostBuilder = Host.CreateApplicationBuilder(args);
 
 var configuration = hostBuilder.Configuration;
 

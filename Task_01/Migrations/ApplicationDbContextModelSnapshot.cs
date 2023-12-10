@@ -24,7 +24,7 @@ namespace Task_01.Migrations
 
             modelBuilder.Entity("Task_01.Persistence.Entities.FileData", b =>
                 {
-                    b.Property<Guid>("Key")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
@@ -45,7 +45,7 @@ namespace Task_01.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Key");
+                    b.HasKey("Id");
 
                     b.ToTable("FilesData");
                 });

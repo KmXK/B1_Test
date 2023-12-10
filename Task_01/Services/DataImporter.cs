@@ -109,7 +109,7 @@ public class DataImporter(
 
         return new FileData
         {
-            Key = Guid.NewGuid(),
+            Id = Guid.NewGuid(),
             Date = DateOnly.FromDateTime(DateTime.Parse(data[0])),
             EnglishString = data[1],
             RussianString = data[2],

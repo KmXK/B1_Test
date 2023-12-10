@@ -12,7 +12,7 @@ using Task_01.Persistence;
 namespace Task_01.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231209202813_Initial migration")]
+    [Migration("20231210151702_Initial migration")]
     partial class Initialmigration
     {
         /// <inheritdoc />
@@ -27,7 +27,7 @@ namespace Task_01.Migrations
 
             modelBuilder.Entity("Task_01.Persistence.Entities.FileData", b =>
                 {
-                    b.Property<Guid>("Key")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
@@ -48,7 +48,7 @@ namespace Task_01.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Key");
+                    b.HasKey("Id");
 
                     b.ToTable("FilesData");
                 });
