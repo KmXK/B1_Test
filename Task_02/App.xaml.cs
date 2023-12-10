@@ -38,6 +38,9 @@ public partial class App
     {
         await _host.StartAsync();
 
+        var context = _host.Services.GetService<AppDbContext>()!;
+        await context.Database.MigrateAsync();
+
         var mainWindow = _host.Services.GetService<MainWindow>()!;
         mainWindow.Show();
     }
