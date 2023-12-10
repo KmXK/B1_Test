@@ -31,7 +31,11 @@
                     </ComboBox.ItemTemplate>
                 </ComboBox>
 
-                <Button Grid.Column="1" Command="{Binding RefreshBanksCommand}" Content="Refresh"></Button>
+                <StackPanel Grid.Column="1" >
+                    <Button Command="{Binding RefreshBanksCommand}" Content="Refresh"></Button>
+                    <Button Command="{Binding ImportExcelCommand}" Content="Import"></Button>
+                </StackPanel>
+                
             </Grid>
            
         </Grid>

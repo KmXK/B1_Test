@@ -3,7 +3,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using OfficeOpenXml;
 using Task_02.Persistence;
+using Task_02.Services;
+using Task_02.Services.Interfaces;
 using Task_02.ViewModels;
 
 namespace Task_02;
@@ -35,6 +38,11 @@ public partial class App
         services.AddSingleton<MainWindow>();
 
         services.AddTransient<MainWindowViewModel>();
+        services.AddTransient<ITurnoverExcelParser, TurnoverExcelParser>();
+        
+        ExcelPackage.LicenseContext = configuration["EPPlus:ExcelPackage:LicenseContext"] == "Commercial"
+            ? LicenseContext.Commercial
+            : LicenseContext.NonCommercial;
     }
 
     private async void App_OnStartup(object sender, StartupEventArgs e)
