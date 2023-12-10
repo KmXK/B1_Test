@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Task_02.Persistence;
+using Task_02.ViewModels;
 
 namespace Task_02;
 
@@ -32,6 +33,8 @@ public partial class App
         });
 
         services.AddSingleton<MainWindow>();
+
+        services.AddTransient<MainWindowViewModel>();
     }
 
     private async void App_OnStartup(object sender, StartupEventArgs e)

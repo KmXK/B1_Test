@@ -4,9 +4,36 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Task_02"
+        xmlns:vm="clr-namespace:Task_02.ViewModels"
+        xmlns:models="clr-namespace:Task_02.Persistence.Entities"
+        d:DataContext="{d:DesignInstance vm:MainWindowViewModel}"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="MainWindow" Height="450" Width="800"
+        Loaded="MainWindow_OnLoaded">
+    <Grid Margin="2">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="100"/>
+                </Grid.ColumnDefinitions>
+                <ComboBox Grid.Column="0" ItemsSource="{Binding Banks}" SelectedItem="{Binding SelectedBank}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate DataType="{x:Type models:Bank}">
+                            <Grid>
+                                <TextBlock Text="{Binding Name}" />
+                            </Grid>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
 
+                <Button Grid.Column="1" Command="{Binding RefreshBanksCommand}" Content="Refresh"></Button>
+            </Grid>
+           
+        </Grid>
     </Grid>
 </Window>
