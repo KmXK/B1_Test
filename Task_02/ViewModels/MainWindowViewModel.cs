@@ -16,22 +16,25 @@ public partial class MainWindowViewModel(
     ITurnoverExcelImporter turnoverExcelImporter) : ObservableObject
 {
     [ObservableProperty]
-    private ObservableCollection<Bank> _banks = new();
+    private ObservableCollection<TurnoverStatement> _turnoverStatements = new();
 
     [ObservableProperty]
-    private Bank? _selectedBank;
+    private TurnoverStatement? _selectedStatement;
 
     [RelayCommand]
     private async Task RefreshBanksAsync()
     {
-        Banks.Clear();
-        SelectedBank = null;
+        TurnoverStatements.Clear();
+        SelectedStatement = null;
         
-        var banks = await context.Set<Bank>().ToListAsync();
+        var turnoverStatements = await context
+            .Set<TurnoverStatement>()
+            .Include(x => x.Bank)
+            .ToListAsync();
         
-        banks.ForEach(bank => Banks.Add(bank));
+        turnoverStatements.ForEach(bank => TurnoverStatements.Add(bank));
 
-        SelectedBank = Banks.FirstOrDefault();
+        SelectedStatement = TurnoverStatements.FirstOrDefault();
     }
 
     [RelayCommand]
