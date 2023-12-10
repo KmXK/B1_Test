@@ -3,15 +3,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Task_02.Persistence;
 
-public class AppDbContext(string connectionString) : DbContext
+public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-    }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.UseSqlServer(connectionString);
     }
 }

@@ -10,6 +10,6 @@ public class AppDbContextDesignFactory : IDesignTimeDbContextFactory<AppDbContex
         var builder = new DbContextOptionsBuilder<AppDbContext>();
         builder.UseSqlServer();
 
-        return new AppDbContext(null!);
+        return new AppDbContext(builder.Options);
     }
 }
