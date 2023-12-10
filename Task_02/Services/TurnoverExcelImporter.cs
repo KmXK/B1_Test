@@ -1,7 +1,6 @@
 ﻿using System.Globalization;
 using System.IO;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Protocols;
 using OfficeOpenXml;
 using Task_02.Exceptions;
 using Task_02.Models;
@@ -12,14 +11,14 @@ using Task_02.Services.Interfaces;
 
 namespace Task_02.Services;
 
-public class TurnoverExcelParser(AppDbContext context) : ITurnoverExcelParser
+public class TurnoverExcelImporter(AppDbContext context) : ITurnoverExcelImporter
 {
-    static TurnoverExcelParser()
+    static TurnoverExcelImporter()
     {
         ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
     }
-    
-    public Task<TurnoverStatement> ParseAsync(string fileName)
+   
+    public Task<TurnoverStatement> ImportAsync(string fileName)
     {
         return Task.Run(() =>
         {
@@ -54,7 +53,12 @@ public class TurnoverExcelParser(AppDbContext context) : ITurnoverExcelParser
             throw new ExcelParseException("Turnover creation date not found.");
         }
         
-        if (DateTime.TryParseExact(value.Text, "d.M.yyyy H:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
+        if (DateTime.TryParseExact(
+                value.Text,
+                "d.M.yyyy H:mm:ss",
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None,
+                out var date))
         {
             return date;
         }
@@ -93,19 +97,19 @@ public class TurnoverExcelParser(AppDbContext context) : ITurnoverExcelParser
         }
     }
 
-    private  TurnoverStatement ReadTurnoverStatement(ExcelWorksheet worksheet)
+    private TurnoverStatement ReadTurnoverStatement(ExcelWorksheet worksheet)
     {
         var readClasses = ReadClasses(worksheet);
         var bankName = ReadBankName(worksheet);
         var turnoverCreationDate = ReadTurnoverCreationDate(worksheet);
         var (from, to) = ReadTurnoverPeriod(worksheet);
-
+        
+        using var transaction = context.Database.BeginTransaction();
+        
         var bank = context
             .Set<Bank>()
             .Include(x => x.Classes)
             .FirstOrDefault(x => x.Name == bankName);
-
-        using var transaction = context.Database.BeginTransaction();
         
         if (bank == null)
         {
@@ -117,20 +121,22 @@ public class TurnoverExcelParser(AppDbContext context) : ITurnoverExcelParser
             context.Add(bank);
             context.SaveChanges();
         }
-
-        var classes = bank.Classes.ToDictionary(x => x.ClassNumber);
-        var accountStatements = new List<AccountTurnoverStatement>();
         
         var existingAccounts = context
             .Set<BankAccount>()
             .Where(x => x.BankId == bank.Id)
             .Select(x => new { x.AccountNumber, x.ClassNumber, x.Type })
             .ToDictionary(x => x.AccountNumber);
+
+        var classes = bank.Classes.ToDictionary(x => x.ClassNumber);
+        var accountStatements = new List<AccountTurnoverStatement>();
         
         foreach (var (classNumber, className, classAccountStatements) in readClasses)
         {
+            // If bank class with such number already exists.
             if (classes.TryGetValue(classNumber, out var bankClass))
             {
+                // Check if class name is the same.
                 if (bankClass.Name != className)
                 {
                     throw new ExcelParseException($"Class with number {classNumber} already exists and has different name.");
@@ -149,8 +155,10 @@ public class TurnoverExcelParser(AppDbContext context) : ITurnoverExcelParser
                 bank.Classes.Add(bankClass);
             }
             
+            // If bank already contains classes.
             if (classes.Count > 0)
             {
+                // Check if there are accounts with different class number.
                 var accountsWithDifferentClassAmount = classAccountStatements
                     .Count(x => existingAccounts.TryGetValue(x.AccountNumber, out var existingAccount) &&
                                 existingAccount.ClassNumber != bankClass.ClassNumber);
@@ -164,15 +172,17 @@ public class TurnoverExcelParser(AppDbContext context) : ITurnoverExcelParser
 
             foreach (var accountStatement in classAccountStatements)
             {
+                // Update account data.
                 accountStatement.Account.AccountNumber = accountStatement.AccountNumber;
                 accountStatement.Account.BankId = bank.Id;
                 accountStatement.Account.ClassNumber = bankClass.ClassNumber;
                 accountStatement.Account.Bank = bank;
                 accountStatement.Account.BankClass = bankClass;
                 
-                // if account already exists
+                // If account already exists
                 if (existingAccounts.TryGetValue(accountStatement.AccountNumber, out var existingAccount))
                 {
+                    // Check his type and throw exception if it's different.
                     if (existingAccount.Type != AccountType.Undefined &&
                         existingAccount.Type != accountStatement.Account.Type)
                     {
@@ -180,6 +190,7 @@ public class TurnoverExcelParser(AppDbContext context) : ITurnoverExcelParser
                             $"Account with number {accountStatement.AccountNumber} already exists and has different type.");
                     }
 
+                    // Attach entity to context to update it.
                     context.Attach(accountStatement.Account);
                 }
                

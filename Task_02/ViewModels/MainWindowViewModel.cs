@@ -13,7 +13,7 @@ namespace Task_02.ViewModels;
 
 public partial class MainWindowViewModel(
     AppDbContext context,
-    ITurnoverExcelParser turnoverExcelParser) : ObservableObject
+    ITurnoverExcelImporter turnoverExcelImporter) : ObservableObject
 {
     [ObservableProperty]
     private ObservableCollection<Bank> _banks = new();
@@ -22,7 +22,7 @@ public partial class MainWindowViewModel(
     private Bank? _selectedBank;
 
     [RelayCommand]
-    private async Task RefreshBanks()
+    private async Task RefreshBanksAsync()
     {
         Banks.Clear();
         SelectedBank = null;
@@ -35,7 +35,7 @@ public partial class MainWindowViewModel(
     }
 
     [RelayCommand]
-    private async Task ImportExcel()
+    private async Task ImportExcelAsync()
     {
         var openFileDialog = new OpenFileDialog
         {
@@ -52,7 +52,7 @@ public partial class MainWindowViewModel(
 
         try
         {
-            await turnoverExcelParser.ParseAsync(openFileDialog.FileName);
+            await turnoverExcelImporter.ImportAsync(openFileDialog.FileName);
         }
         catch (ExcelParseException e)
         {

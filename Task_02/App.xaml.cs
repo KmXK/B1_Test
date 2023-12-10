@@ -38,7 +38,8 @@ public partial class App
         services.AddSingleton<MainWindow>();
 
         services.AddTransient<MainWindowViewModel>();
-        services.AddTransient<ITurnoverExcelParser, TurnoverExcelParser>();
+        
+        services.AddTransient<ITurnoverExcelImporter, TurnoverExcelImporter>();
         
         ExcelPackage.LicenseContext = configuration["EPPlus:ExcelPackage:LicenseContext"] == "Commercial"
             ? LicenseContext.Commercial
