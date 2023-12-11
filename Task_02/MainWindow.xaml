@@ -7,118 +7,142 @@
         xmlns:vm="clr-namespace:Task_02.ViewModels"
         xmlns:models="clr-namespace:Task_02.Persistence.Entities"
         xmlns:c="clr-namespace:Task_02.Converters"
+        xmlns:fa="http://schemas.fontawesome.io/icons/"
         d:DataContext="{d:DesignInstance vm:MainWindowViewModel}"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800"
         Loaded="MainWindow_OnLoaded">
-    <Grid Margin="2">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="250"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+    <Grid>
+        <Border>
+            <Border.Resources>
+                <ResourceDictionary>
+                    <c:BoolToIntegerConverter
+                        x:Key="GaussianConverter"
+                        FalseValue="0"
+                        TrueValue="2"
+                        />
+                </ResourceDictionary>
+            </Border.Resources>
+            <Border.Effect>
+                <BlurEffect Radius="{Binding IsLoading, Converter={StaticResource GaussianConverter}}" 
+                            KernelType="Gaussian"/>
+            </Border.Effect>
 
-        <Grid Grid.Column="0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/> 
-                <RowDefinition Height="Auto"/> 
-            </Grid.RowDefinitions>
-            
-            <ListBox Grid.Row="0" ItemsSource="{Binding TurnoverStatements}" SelectedItem="{Binding SelectedStatement}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate DataType="{x:Type models:TurnoverStatement}">
-                        <Grid>
-                            <TextBlock Text="{Binding Converter={c:TurnoverStatementNameConverter}}" />
-                        </Grid>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
-
-            <Grid Grid.Row="1">
+            <Grid Margin="2">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="250" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                
-                <Button Grid.Column="0" Content="Refresh" Command="{Binding RefreshBanksCommand}" />
-                <Button Grid.Column="1" Content="Import" Command="{Binding ImportExcelCommand}" />
-            </Grid>
-        </Grid>
-        <Grid Grid.Column="1">
-            <Grid.Resources>
-                <CollectionViewSource x:Key="ViewSource" Source="{Binding AccountTurnoverStatements, IsAsync=True}">
-                    <CollectionViewSource.GroupDescriptions>
-                        <PropertyGroupDescription PropertyName="ClassName"/>
-                    </CollectionViewSource.GroupDescriptions>
-                </CollectionViewSource>
-            </Grid.Resources>
-            <DataGrid ItemsSource="{Binding Source={StaticResource ViewSource}, IsAsync=True}"
-                      AutoGenerateColumns="False"
-                      IsReadOnly="True"
-                      CanUserSortColumns="False"
-                      CanUserAddRows="False"
-                      CanUserDeleteRows="False"
-                      EnableRowVirtualization="True"
-                      EnableColumnVirtualization="True">
-                <DataGrid.GroupStyle>
-                    <GroupStyle>
-                        <GroupStyle.ContainerStyle>
-                            <Style TargetType="{x:Type GroupItem}">
-                                <Setter Property="Margin" Value="0,0,0,5"/>
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="{x:Type GroupItem}">
-                                            <Expander IsExpanded="False" BorderThickness="1,1,1,5">
-                                                <Expander.Header>
-                                                    <DockPanel>
-                                                        <TextBlock FontWeight="Bold" Text="{Binding Path=Name}"/>
-                                                    </DockPanel>
-                                                </Expander.Header>
-                                                <Expander.Content>
-                                                    <ItemsPresenter />
-                                                </Expander.Content>
-                                            </Expander>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
+
+                <Grid Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <ListBox Grid.Row="0" ItemsSource="{Binding TurnoverStatements}"
+                             SelectedItem="{Binding SelectedStatement}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate DataType="{x:Type models:TurnoverStatement}">
+                                <Grid>
+                                    <TextBlock Text="{Binding Converter={c:TurnoverStatementNameConverter}}" />
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Button Grid.Column="0" Content="Refresh" Command="{Binding RefreshBanksCommand}" />
+                        <Button Grid.Column="1" Content="Import" Command="{Binding ImportExcelCommand}" />
+                    </Grid>
+                </Grid>
+                <Grid Grid.Column="1">
+                    <Grid.Resources>
+                        <CollectionViewSource x:Key="ViewSource"
+                                              Source="{Binding AccountTurnoverStatements, IsAsync=True}">
+                            <CollectionViewSource.GroupDescriptions>
+                                <PropertyGroupDescription PropertyName="ClassName" />
+                            </CollectionViewSource.GroupDescriptions>
+                        </CollectionViewSource>
+                    </Grid.Resources>
+                    <DataGrid ItemsSource="{Binding Source={StaticResource ViewSource}, IsAsync=True}"
+                              AutoGenerateColumns="False"
+                              IsReadOnly="True"
+                              CanUserSortColumns="False"
+                              CanUserAddRows="False"
+                              CanUserDeleteRows="False"
+                              EnableRowVirtualization="True"
+                              EnableColumnVirtualization="True">
+                        <DataGrid.GroupStyle>
+                            <GroupStyle>
+                                <GroupStyle.ContainerStyle>
+                                    <Style TargetType="{x:Type GroupItem}">
+                                        <Setter Property="Margin" Value="0,0,0,5" />
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="{x:Type GroupItem}">
+                                                    <Expander IsExpanded="False" BorderThickness="1,1,1,5">
+                                                        <Expander.Header>
+                                                            <DockPanel>
+                                                                <TextBlock FontWeight="Bold" Text="{Binding Path=Name}" />
+                                                            </DockPanel>
+                                                        </Expander.Header>
+                                                        <Expander.Content>
+                                                            <ItemsPresenter />
+                                                        </Expander.Content>
+                                                    </Expander>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </GroupStyle.ContainerStyle>
+                            </GroupStyle>
+                        </DataGrid.GroupStyle>
+                        <DataGrid.RowStyle>
+                            <Style TargetType="DataGridRow">
+                                <Setter Property="FontWeight" Value="Normal" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsGroup}" Value="True">
+                                        <Setter Property="FontWeight" Value="Bold" />
+                                    </DataTrigger>
+                                </Style.Triggers>
                             </Style>
-                        </GroupStyle.ContainerStyle>
-                    </GroupStyle>
-                </DataGrid.GroupStyle>
-                <DataGrid.RowStyle>
-                    <Style TargetType="DataGridRow">
-                        <Setter Property="FontWeight" Value="Normal"/>
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsGroup}" Value="True">
-                                <Setter Property="FontWeight" Value="Bold"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </DataGrid.RowStyle>
-                <DataGrid.Resources>
-                    <Style x:Key="RightAligned" TargetType="TextBlock">
-                        <Setter Property="HorizontalAlignment" Value="Right"/>
-                    </Style>
-                    <Style x:Key="LeftAligned" TargetType="TextBlock">
-                        <Setter Property="HorizontalAlignment" Value="Left"/>
-                    </Style>
-                </DataGrid.Resources>
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Б/сч" Binding="{Binding AccountNumber}"
-                                        ElementStyle="{StaticResource LeftAligned}"/>
-                    <DataGridTextColumn Header="Входящее сальдо, актив" Binding="{Binding ActiveIncoming}"
-                                        ElementStyle="{StaticResource RightAligned}"/>
-                    <DataGridTextColumn Header="Входящее сальдо, пассив" Binding="{Binding PassiveIncoming}"
-                                        ElementStyle="{StaticResource RightAligned}"/>
-                    <DataGridTextColumn Header="Обороты, дебет" Binding="{Binding DebitTurnover}"
-                                        ElementStyle="{StaticResource RightAligned}"/>
-                    <DataGridTextColumn Header="Обороты, кредит" Binding="{Binding CreditTurnover}"
-                                        ElementStyle="{StaticResource RightAligned}"/>
-                    <DataGridTextColumn Header="Исходящее сальдо, актив" Binding="{Binding ActiveOutgoing}"
-                                        ElementStyle="{StaticResource RightAligned}"/>
-                    <DataGridTextColumn Header="Исходящее сальдо, пассив" Binding="{Binding PassiveOutgoing}"
-                                        ElementStyle="{StaticResource RightAligned}"/>
-                </DataGrid.Columns>
-            </DataGrid>
-        </Grid>
+                        </DataGrid.RowStyle>
+                        <DataGrid.Resources>
+                            <Style x:Key="RightAligned" TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Right" />
+                            </Style>
+                            <Style x:Key="LeftAligned" TargetType="TextBlock">
+                                <Setter Property="HorizontalAlignment" Value="Left" />
+                            </Style>
+                        </DataGrid.Resources>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Б/сч" Binding="{Binding AccountNumber}"
+                                                ElementStyle="{StaticResource LeftAligned}" />
+                            <DataGridTextColumn Header="Входящее сальдо, актив" Binding="{Binding ActiveIncoming}"
+                                                ElementStyle="{StaticResource RightAligned}" />
+                            <DataGridTextColumn Header="Входящее сальдо, пассив" Binding="{Binding PassiveIncoming}"
+                                                ElementStyle="{StaticResource RightAligned}" />
+                            <DataGridTextColumn Header="Обороты, дебет" Binding="{Binding DebitTurnover}"
+                                                ElementStyle="{StaticResource RightAligned}" />
+                            <DataGridTextColumn Header="Обороты, кредит" Binding="{Binding CreditTurnover}"
+                                                ElementStyle="{StaticResource RightAligned}" />
+                            <DataGridTextColumn Header="Исходящее сальдо, актив" Binding="{Binding ActiveOutgoing}"
+                                                ElementStyle="{StaticResource RightAligned}" />
+                            <DataGridTextColumn Header="Исходящее сальдо, пассив" Binding="{Binding PassiveOutgoing}"
+                                                ElementStyle="{StaticResource RightAligned}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <fa:ImageAwesome Icon="Refresh" Spin="True" Width="50" Height="50"
+                         Visibility="{Binding IsLoading, Converter={c:BoolToVisibilityConverter}}"/>
     </Grid>
 </Window>

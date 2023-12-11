@@ -24,15 +24,22 @@ public partial class MainWindowViewModel(
     [ObservableProperty]
     private TurnoverStatement? _selectedStatement;
 
+    [ObservableProperty]
+    private bool _isLoading = false;
+
     partial void OnSelectedStatementChanged(TurnoverStatement? oldValue, TurnoverStatement? newValue)
     {
         if (newValue != null)
         {
+            IsLoading = true;
+            
             var viewModels = GetViewModels(newValue.AccountTurnoverStatements);
 
             AccountTurnoverStatements.Clear();
 
             AccountTurnoverStatements.InsertRange(viewModels);
+
+            IsLoading = false;
         }
     }
 
@@ -103,6 +110,8 @@ public partial class MainWindowViewModel(
     [RelayCommand]
     private async Task RefreshBanksAsync()
     {
+        IsLoading = true;
+        
         TurnoverStatements.Clear();
         SelectedStatement = null;
 
@@ -116,11 +125,15 @@ public partial class MainWindowViewModel(
         TurnoverStatements.InsertRange(turnoverStatements);
 
         SelectedStatement = TurnoverStatements.FirstOrDefault();
+        
+        IsLoading = false;
     }
 
     [RelayCommand]
     private async Task ImportExcelAsync()
     {
+        IsLoading = true;
+        
         var openFileDialog = new OpenFileDialog
         {
             Filter = "Excel files (*.xlsx)|*.xlsx|All files (*.*)|*.*",
@@ -137,6 +150,8 @@ public partial class MainWindowViewModel(
         try
         {
             await turnoverExcelImporter.ImportAsync(openFileDialog.FileName);
+
+            await RefreshBanksAsync();
         }
         catch (ExcelParseException e)
         {
@@ -145,7 +160,8 @@ public partial class MainWindowViewModel(
         catch(Exception e)
         {
             MessageBoxEx.ShowError("Unknown error occured while parsing excel file.");
-            Console.WriteLine(e);
         }
+        
+        IsLoading = false;
     }
 }
