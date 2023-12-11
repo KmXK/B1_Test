@@ -17,7 +17,7 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         
-        <Grid>
+        <Grid Grid.Column="0">
             <ListBox ItemsSource="{Binding TurnoverStatements}" SelectedItem="{Binding SelectedStatement}">
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type models:TurnoverStatement}">
@@ -27,6 +27,34 @@
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
+        </Grid>
+        <Grid Grid.Column="1">
+            <DataGrid ItemsSource="{Binding AccountTurnoverStatements}" AutoGenerateColumns="False" IsReadOnly="True">
+                <DataGrid.Resources>
+                    <Style x:Key="RightAligned" TargetType="TextBlock">
+                        <Setter Property="HorizontalAlignment" Value="Right"/>
+                    </Style>
+                    <Style x:Key="LeftAligned" TargetType="TextBlock">
+                        <Setter Property="HorizontalAlignment" Value="Left"/>
+                    </Style>
+                </DataGrid.Resources>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Б/сч" Binding="{Binding AccountNumber}" 
+                                        ElementStyle="{StaticResource LeftAligned}"/>
+                    <DataGridTextColumn Header="Входящее сальдо, актив" Binding="{Binding ActiveIncoming}"
+                                        ElementStyle="{StaticResource RightAligned}"/>
+                    <DataGridTextColumn Header="Входящее сальдо, пассив" Binding="{Binding PassiveIncoming}"
+                                        ElementStyle="{StaticResource RightAligned}"/>
+                    <DataGridTextColumn Header="Обороты, дебет" Binding="{Binding DebitTurnover}"
+                                        ElementStyle="{StaticResource RightAligned}"/>
+                    <DataGridTextColumn Header="Обороты, кредит" Binding="{Binding CreditTurnover}"
+                                        ElementStyle="{StaticResource RightAligned}"/>
+                    <DataGridTextColumn Header="Исходящее сальдо, актив" Binding="{Binding ActiveOutgoing}"
+                                        ElementStyle="{StaticResource RightAligned}"/>
+                    <DataGridTextColumn Header="Исходящее сальдо, пассив" Binding="{Binding PassiveOutgoing}"
+                                        ElementStyle="{StaticResource RightAligned}"/>
+                </DataGrid.Columns>
+            </DataGrid>
         </Grid>
     </Grid>
 </Window>

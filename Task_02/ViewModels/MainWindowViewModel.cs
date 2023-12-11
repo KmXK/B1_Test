@@ -19,7 +19,22 @@ public partial class MainWindowViewModel(
     private ObservableCollection<TurnoverStatement> _turnoverStatements = new();
 
     [ObservableProperty]
+    private ObservableCollection<AccountTurnoverStatementViewModel> _accountTurnoverStatements = new();
+
+    [ObservableProperty]
     private TurnoverStatement? _selectedStatement;
+
+    partial void OnSelectedStatementChanged(TurnoverStatement? oldValue, TurnoverStatement? newValue)
+    {
+        AccountTurnoverStatements.Clear();
+        if (newValue != null)
+        {
+            foreach (var accountTurnoverStatement in newValue.AccountTurnoverStatements)
+            {
+                AccountTurnoverStatements.Add(new AccountTurnoverStatementViewModel(accountTurnoverStatement));
+            }
+        }
+    }
 
     [RelayCommand]
     private async Task RefreshBanksAsync()
@@ -30,6 +45,7 @@ public partial class MainWindowViewModel(
         var turnoverStatements = await context
             .Set<TurnoverStatement>()
             .Include(x => x.Bank)
+            .Include(x => x.AccountTurnoverStatements).ThenInclude(x => x.Account)
             .ToListAsync();
         
         turnoverStatements.ForEach(bank => TurnoverStatements.Add(bank));
