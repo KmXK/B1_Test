@@ -34,6 +34,10 @@
 - Microsoft.Extensions.Hosting (Generic Host + DI Container)
 - EFCore.BulkExtensions (NuGet пакет с Bulk-операциями с базой данных)
 
+### Видео с демонстрацией работы
+
+[Ссылка](https://youtu.be/oFrahO9Ie6U)
+
 ## Задание 2
 
 1. Проанализировать структуру excel-файла «ОСВ для тренинга». Разработать схему (несколько таблиц) в СУБД, в которой наиболее удобно будет хранить данные из файлов такого формата
@@ -49,3 +53,7 @@
 - EPPlus (чтение Excel файлов)
 - FontAwesome.WPF (иконки)
 - Microsoft.Extensions.Hosting (Generic Host + DI Container)
+
+### Видео с демонстрацией работы
+
+[Ссылка](https://youtu.be/Bg6sZtN2k_Y)
