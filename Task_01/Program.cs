@@ -19,8 +19,8 @@ hostBuilder.Services.AddDbContext<ApplicationDbContext>(options =>
 });
 
 hostBuilder.Logging
-    .ClearProviders()
-    .AddSimpleConsole();
+    .ClearProviders();
+    //.AddSimpleConsole();
 
 hostBuilder.Services.Configure<DataImporterOptions>(configuration.GetSection("Importer"));
 

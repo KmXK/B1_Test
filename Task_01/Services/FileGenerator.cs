@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Logging;
+using Task_01.Helpers;
 using Task_01.Services.Interfaces;
 
 namespace Task_01.Services;
@@ -16,12 +18,22 @@ public class FileGenerator(
         string fileNamePrefix = "file_",
         CancellationToken cancellationToken = default)
     {
+        var currentCount = 0;
+
+        var consoleLock = new object();
+        
         await Parallel.ForAsync(0, count, cancellationToken, async (i, c) =>
         {
             c.ThrowIfCancellationRequested();
             
             var path = Path.Combine(directoryInfo.FullName, $"{fileNamePrefix}{i}");
             await CreateFileAsync(path, c);
+            
+            lock (consoleLock)
+            {
+                currentCount++;
+                ConsoleHelper.WriteLine($"File [{currentCount}/100] has been generated.", ConsoleColor.Green);
+            }
         });
     }
     

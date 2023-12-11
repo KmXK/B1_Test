@@ -2,6 +2,7 @@
 using EFCore.BulkExtensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Task_01.Helpers;
 using Task_01.Options;
 using Task_01.Persistence;
 using Task_01.Persistence.Entities;
@@ -47,6 +48,7 @@ public class DataImporter(
 
                     if (count % 25000 == 0)
                     {
+                        ConsoleHelper.WriteLine($"Read {count} elements from file.", ConsoleColor.Green);
                         logger.LogInformation("Read {count} elements from file.", count);
                         count = 0;
                     }
@@ -59,6 +61,7 @@ public class DataImporter(
 
                 if (count > 0)
                 {
+                    ConsoleHelper.WriteLine($"Read {count} elements from file.", ConsoleColor.Green);
                     logger.LogInformation("IMPORT: Read {count} elements from file.", count);
                 }
             }
@@ -93,8 +96,9 @@ public class DataImporter(
                     writeSemaphore.Release(1);
                 }
 
-                logger.LogInformation("IMPORT: Wrote {data} elements to db. Waiting: {bag}", data.Count, bag.Count);
                 context.BulkInsert(data);
+                ConsoleHelper.WriteLine($"Wrote {data.Count} elements from file. Waiting: {bag.Count}", ConsoleColor.Green);
+                logger.LogInformation("IMPORT: Wrote {data} elements to db. Waiting: {bag}", data.Count, bag.Count);
                 
                 data.Clear();
             }

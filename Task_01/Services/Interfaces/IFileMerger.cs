@@ -2,7 +2,7 @@
 
 public interface IFileMerger
 {
-    Task MergeAsync(
+    Task<int> MergeAsync(
         IEnumerable<FileInfo> files,
         string outputFilePath,
         Func<string, bool>? mergeLinePredicate = null,
