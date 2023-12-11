@@ -17,21 +17,29 @@ public partial class MainWindowViewModel(
 {
     [ObservableProperty]
     private ObservableCollection<TurnoverStatement> _turnoverStatements = new();
-
+    
     [ObservableProperty]
     private ObservableCollection<AccountTurnoverStatementViewModel> _accountTurnoverStatements = new();
-
+    
     [ObservableProperty]
     private TurnoverStatement? _selectedStatement;
-
+    
     [ObservableProperty]
     private bool _isLoading = false;
+    
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(RefreshBanksCommand))]
+    private bool _canRefresh;
+    
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(ImportExcelCommand))]
+    private bool _canImport;
 
     partial void OnSelectedStatementChanged(TurnoverStatement? oldValue, TurnoverStatement? newValue)
     {
         if (newValue != null)
         {
-            IsLoading = true;
+            SetLoading(true);
             
             var viewModels = GetViewModels(newValue.AccountTurnoverStatements);
 
@@ -39,7 +47,7 @@ public partial class MainWindowViewModel(
 
             AccountTurnoverStatements.InsertRange(viewModels);
 
-            IsLoading = false;
+            SetLoading(false);
         }
     }
 
@@ -107,10 +115,10 @@ public partial class MainWindowViewModel(
         }
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanRefresh))]
     private async Task RefreshBanksAsync()
     {
-        IsLoading = true;
+        SetLoading(true);
         
         TurnoverStatements.Clear();
         SelectedStatement = null;
@@ -126,13 +134,13 @@ public partial class MainWindowViewModel(
 
         SelectedStatement = TurnoverStatements.FirstOrDefault();
         
-        IsLoading = false;
+        SetLoading(false);
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanImport))]
     private async Task ImportExcelAsync()
     {
-        IsLoading = true;
+        SetLoading(true);
         
         var openFileDialog = new OpenFileDialog
         {
@@ -162,6 +170,12 @@ public partial class MainWindowViewModel(
             MessageBoxEx.ShowError("Unknown error occured while parsing excel file.");
         }
         
-        IsLoading = false;
+        SetLoading(false);
+    }
+
+    private void SetLoading(bool loading)
+    {
+        IsLoading = loading;
+        CanImport = CanRefresh = !loading;
     }
 }

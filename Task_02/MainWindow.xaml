@@ -57,8 +57,12 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        <Button Grid.Column="0" Content="Refresh" Command="{Binding RefreshBanksCommand}" />
-                        <Button Grid.Column="1" Content="Import" Command="{Binding ImportExcelCommand}" />
+                        <Button Grid.Column="0" 
+                                Content="Refresh" 
+                                Command="{Binding RefreshBanksCommand}"/>
+                        <Button Grid.Column="1" 
+                                Content="Import" 
+                                Command="{Binding ImportExcelCommand}" />
                     </Grid>
                 </Grid>
                 <Grid Grid.Column="1">
