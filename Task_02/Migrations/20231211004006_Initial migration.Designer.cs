@@ -12,7 +12,7 @@ using Task_02.Persistence;
 namespace Task_02.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20231210221026_Initial migration")]
+    [Migration("20231211004006_Initial migration")]
     partial class Initialmigration
     {
         /// <inheritdoc />
@@ -90,6 +90,12 @@ namespace Task_02.Migrations
                     b.Property<short>("AccountNumber")
                         .HasColumnType("smallint");
 
+                    b.Property<int>("BankClassBankId")
+                        .HasColumnType("int");
+
+                    b.Property<byte>("BankClassClassNumber")
+                        .HasColumnType("tinyint");
+
                     b.Property<byte>("ClassNumber")
                         .HasColumnType("tinyint");
 
@@ -98,7 +104,7 @@ namespace Task_02.Migrations
 
                     b.HasKey("BankId", "AccountNumber");
 
-                    b.HasIndex("BankId", "ClassNumber");
+                    b.HasIndex("BankClassBankId", "BankClassClassNumber");
 
                     b.ToTable("BankAccounts", (string)null);
                 });
@@ -177,9 +183,9 @@ namespace Task_02.Migrations
                         .IsRequired();
 
                     b.HasOne("Task_02.Persistence.Entities.BankClass", "BankClass")
-                        .WithMany("Accounts")
-                        .HasForeignKey("BankId", "ClassNumber")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .WithMany()
+                        .HasForeignKey("BankClassBankId", "BankClassClassNumber")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Bank");
@@ -212,11 +218,6 @@ namespace Task_02.Migrations
             modelBuilder.Entity("Task_02.Persistence.Entities.Bank", b =>
                 {
                     b.Navigation("Classes");
-                });
-
-            modelBuilder.Entity("Task_02.Persistence.Entities.BankClass", b =>
-                {
-                    b.Navigation("Accounts");
                 });
 
             modelBuilder.Entity("Task_02.Persistence.Entities.TurnoverStatement", b =>

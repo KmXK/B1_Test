@@ -71,16 +71,19 @@ namespace Task_02.Migrations
                     AccountNumber = table.Column<short>(type: "smallint", nullable: false),
                     BankId = table.Column<int>(type: "int", nullable: false),
                     Type = table.Column<int>(type: "int", nullable: false),
-                    ClassNumber = table.Column<byte>(type: "tinyint", nullable: false)
+                    ClassNumber = table.Column<byte>(type: "tinyint", nullable: false),
+                    BankClassBankId = table.Column<int>(type: "int", nullable: false),
+                    BankClassClassNumber = table.Column<byte>(type: "tinyint", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_BankAccounts", x => new { x.BankId, x.AccountNumber });
                     table.ForeignKey(
-                        name: "FK_BankAccounts_BankClasses_BankId_ClassNumber",
-                        columns: x => new { x.BankId, x.ClassNumber },
+                        name: "FK_BankAccounts_BankClasses_BankClassBankId_BankClassClassNumber",
+                        columns: x => new { x.BankClassBankId, x.BankClassClassNumber },
                         principalTable: "BankClasses",
-                        principalColumns: new[] { "BankId", "ClassNumber" });
+                        principalColumns: new[] { "BankId", "ClassNumber" },
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_BankAccounts_Banks_BankId",
                         column: x => x.BankId,
@@ -128,9 +131,9 @@ namespace Task_02.Migrations
                 column: "TurnoverStatementId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BankAccounts_BankId_ClassNumber",
+                name: "IX_BankAccounts_BankClassBankId_BankClassClassNumber",
                 table: "BankAccounts",
-                columns: new[] { "BankId", "ClassNumber" });
+                columns: new[] { "BankClassBankId", "BankClassClassNumber" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Banks_Name",
