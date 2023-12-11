@@ -45,14 +45,20 @@
         </Grid>
         <Grid Grid.Column="1">
             <Grid.Resources>
-                <CollectionViewSource x:Key="ViewSource" Source="{Binding AccountTurnoverStatements}">
+                <CollectionViewSource x:Key="ViewSource" Source="{Binding AccountTurnoverStatements, IsAsync=True}">
                     <CollectionViewSource.GroupDescriptions>
                         <PropertyGroupDescription PropertyName="ClassName"/>
                     </CollectionViewSource.GroupDescriptions>
                 </CollectionViewSource>
             </Grid.Resources>
-            <DataGrid ItemsSource="{Binding Source={StaticResource ViewSource}}" AutoGenerateColumns="False" IsReadOnly="True"
-                      CanUserSortColumns="False" CanUserAddRows="False" CanUserDeleteRows="False">
+            <DataGrid ItemsSource="{Binding Source={StaticResource ViewSource}, IsAsync=True}"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      CanUserSortColumns="False"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      EnableRowVirtualization="True"
+                      EnableColumnVirtualization="True">
                 <DataGrid.GroupStyle>
                     <GroupStyle>
                         <GroupStyle.ContainerStyle>
@@ -61,7 +67,7 @@
                                 <Setter Property="Template">
                                     <Setter.Value>
                                         <ControlTemplate TargetType="{x:Type GroupItem}">
-                                            <Expander IsExpanded="True" BorderThickness="1,1,1,5">
+                                            <Expander IsExpanded="False" BorderThickness="1,1,1,5">
                                                 <Expander.Header>
                                                     <DockPanel>
                                                         <TextBlock FontWeight="Bold" Text="{Binding Path=Name}"/>

@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.EntityFrameworkCore;
@@ -106,14 +105,15 @@ public partial class MainWindowViewModel(
     {
         TurnoverStatements.Clear();
         SelectedStatement = null;
-        
+
         var turnoverStatements = await context
             .Set<TurnoverStatement>()
             .Include(x => x.Bank)
             .Include(x => x.AccountTurnoverStatements).ThenInclude(x => x.Account.BankClass)
+            .AsNoTracking()
             .ToListAsync();
-        
-        turnoverStatements.ForEach(bank => TurnoverStatements.Add(bank));
+
+        TurnoverStatements.InsertRange(turnoverStatements);
 
         SelectedStatement = TurnoverStatements.FirstOrDefault();
     }
