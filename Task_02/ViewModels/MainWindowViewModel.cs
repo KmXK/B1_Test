@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.EntityFrameworkCore;
@@ -26,13 +27,77 @@ public partial class MainWindowViewModel(
 
     partial void OnSelectedStatementChanged(TurnoverStatement? oldValue, TurnoverStatement? newValue)
     {
-        AccountTurnoverStatements.Clear();
         if (newValue != null)
         {
-            foreach (var accountTurnoverStatement in newValue.AccountTurnoverStatements)
+            var viewModels = GetViewModels(newValue.AccountTurnoverStatements);
+
+            AccountTurnoverStatements.Clear();
+
+            AccountTurnoverStatements.InsertRange(viewModels);
+        }
+    }
+
+    private static IEnumerable<AccountTurnoverStatementViewModel> GetViewModels(
+        IEnumerable<AccountTurnoverStatement> accountTurnoverStatements)
+    {
+        var classNumber = 1;
+        AccountTurnoverStatementViewModel? classTurnoverStatement = null;
+
+        var groupNumber = 0;
+        AccountTurnoverStatementViewModel? groupTurnoverStatement = null;
+
+        foreach (var accountTurnoverStatement in accountTurnoverStatements)
+        {
+            var className = $"КЛАСС {accountTurnoverStatement.Account.ClassNumber} " +
+                            $"{accountTurnoverStatement.Account.BankClass.Name}";
+            
+            if (groupTurnoverStatement == null || groupNumber != accountTurnoverStatement.AccountNumber / 100)
             {
-                AccountTurnoverStatements.Add(new AccountTurnoverStatementViewModel(accountTurnoverStatement));
+                if (groupTurnoverStatement != null)
+                {
+                    yield return groupTurnoverStatement;
+                }
+
+                groupNumber = accountTurnoverStatement.AccountNumber / 100;
+                groupTurnoverStatement = new AccountTurnoverStatementViewModel(groupNumber.ToString())
+                {
+                    ClassName = className
+                };
             }
+            
+            if (classTurnoverStatement == null || classNumber != accountTurnoverStatement.Account.ClassNumber)
+            {
+                if (classTurnoverStatement != null)
+                {
+                    yield return classTurnoverStatement;
+                }
+
+                classNumber = accountTurnoverStatement.Account.ClassNumber;
+                classTurnoverStatement = new AccountTurnoverStatementViewModel("ПО КЛАССУ")
+                {
+                    ClassName = className
+                };
+            }
+
+            var viewModel = new AccountTurnoverStatementViewModel(accountTurnoverStatement)
+            {
+                ClassName = className
+            };
+            
+            groupTurnoverStatement.Add(viewModel);
+            classTurnoverStatement.Add(viewModel);
+
+            yield return viewModel;
+        }
+
+        if (groupTurnoverStatement != null)
+        {
+            yield return groupTurnoverStatement;
+        }
+
+        if (classTurnoverStatement != null)
+        {
+            yield return classTurnoverStatement;
         }
     }
 
@@ -45,7 +110,7 @@ public partial class MainWindowViewModel(
         var turnoverStatements = await context
             .Set<TurnoverStatement>()
             .Include(x => x.Bank)
-            .Include(x => x.AccountTurnoverStatements).ThenInclude(x => x.Account)
+            .Include(x => x.AccountTurnoverStatements).ThenInclude(x => x.Account.BankClass)
             .ToListAsync();
         
         turnoverStatements.ForEach(bank => TurnoverStatements.Add(bank));

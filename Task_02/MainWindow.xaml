@@ -29,7 +29,50 @@
             </ListBox>
         </Grid>
         <Grid Grid.Column="1">
-            <DataGrid ItemsSource="{Binding AccountTurnoverStatements}" AutoGenerateColumns="False" IsReadOnly="True">
+            <Grid.Resources>
+                <CollectionViewSource x:Key="ViewSource" Source="{Binding AccountTurnoverStatements}">
+                    <CollectionViewSource.GroupDescriptions>
+                        <PropertyGroupDescription PropertyName="ClassName"/>
+                    </CollectionViewSource.GroupDescriptions>
+                </CollectionViewSource>
+            </Grid.Resources>
+            <DataGrid ItemsSource="{Binding Source={StaticResource ViewSource}}" AutoGenerateColumns="False" IsReadOnly="True"
+                      CanUserSortColumns="False" CanUserAddRows="False" CanUserDeleteRows="False">
+                <DataGrid.GroupStyle>
+                    <GroupStyle>
+                        <GroupStyle.ContainerStyle>
+                            <Style TargetType="{x:Type GroupItem}">
+                                <Setter Property="Margin" Value="0,0,0,5"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type GroupItem}">
+                                            <Expander IsExpanded="True" BorderThickness="1,1,1,5">
+                                                <Expander.Header>
+                                                    <DockPanel>
+                                                        <TextBlock FontWeight="Bold" Text="{Binding Path=Name}"/>
+                                                    </DockPanel>
+                                                </Expander.Header>
+                                                <Expander.Content>
+                                                    <ItemsPresenter />
+                                                </Expander.Content>
+                                            </Expander>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </GroupStyle.ContainerStyle>
+                    </GroupStyle>
+                </DataGrid.GroupStyle>
+                <DataGrid.RowStyle>
+                    <Style TargetType="DataGridRow">
+                        <Setter Property="FontWeight" Value="Normal"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsGroup}" Value="True">
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.RowStyle>
                 <DataGrid.Resources>
                     <Style x:Key="RightAligned" TargetType="TextBlock">
                         <Setter Property="HorizontalAlignment" Value="Right"/>
@@ -39,7 +82,7 @@
                     </Style>
                 </DataGrid.Resources>
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Б/сч" Binding="{Binding AccountNumber}" 
+                    <DataGridTextColumn Header="Б/сч" Binding="{Binding AccountNumber}"
                                         ElementStyle="{StaticResource LeftAligned}"/>
                     <DataGridTextColumn Header="Входящее сальдо, актив" Binding="{Binding ActiveIncoming}"
                                         ElementStyle="{StaticResource RightAligned}"/>
