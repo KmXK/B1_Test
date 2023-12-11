@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 using Task_02.Exceptions;
 using Task_02.Helpers;
@@ -13,7 +14,7 @@ namespace Task_02.ViewModels;
 
 public partial class MainWindowViewModel(
     AppDbContext context,
-    ITurnoverExcelImporter turnoverExcelImporter) : ObservableObject
+    IServiceProvider serviceProvider) : ObservableObject
 {
     [ObservableProperty]
     private ObservableCollection<TurnoverStatement> _turnoverStatements = new();
@@ -157,6 +158,10 @@ public partial class MainWindowViewModel(
 
         try
         {
+            await using var scope = serviceProvider.CreateAsyncScope();
+            
+            var turnoverExcelImporter = scope.ServiceProvider.GetRequiredService<ITurnoverExcelImporter>();
+            
             await turnoverExcelImporter.ImportAsync(openFileDialog.FileName);
 
             await RefreshBanksAsync();
